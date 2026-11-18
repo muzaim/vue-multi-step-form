@@ -11,7 +11,7 @@ const props = withDefaults(
     errorMessage?: string;
   }>(),
   {
-    modelValue: 4,
+    modelValue: 0,
     disabled: false,
     hasError: false,
   }
@@ -36,6 +36,12 @@ const scoreOptions = [
 
 const selectedRatingBadge = computed(() => {
   const v = props.modelValue;
+  if (!v || v === 0) {
+    return {
+      label: 'Belum dipilih',
+      badgeClass: 'bg-slate-100 text-slate-500 border-slate-200',
+    };
+  }
   if (v <= 3) {
     return {
       label: 'Low',
@@ -76,7 +82,12 @@ function onChange(event: Event) {
         class="inline-flex items-center px-2 py-0.5 text-[11px] font-semibold rounded-md border"
         :class="selectedRatingBadge.badgeClass"
       >
-        Factor: {{ modelValue }}/10 &middot; {{ selectedRatingBadge.label }}
+        <template v-if="modelValue > 0">
+          Factor: {{ modelValue }}/10 &middot; {{ selectedRatingBadge.label }}
+        </template>
+        <template v-else>
+          Factor: Belum dipilih
+        </template>
       </span>
     </div>
 
@@ -87,13 +98,14 @@ function onChange(event: Event) {
         :value="modelValue"
         :disabled="disabled"
         @change="onChange"
-        class="w-full pl-3.5 pr-8 py-2 text-sm text-slate-800 bg-white border rounded-lg shadow-sm transition-colors appearance-none focus:outline-none focus:ring-2 disabled:bg-slate-50 disabled:text-slate-400"
+        class="w-full pl-3.5 pr-8 py-2 text-sm text-slate-800 bg-white border rounded-lg shadow-sm transition-colors appearance-none focus:outline-none focus:ring-2 disabled:bg-slate-50 disabled:text-slate-400 cursor-pointer"
         :class="[
           hasError
             ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-200'
             : 'border-slate-300 focus:border-indigo-500 focus:ring-indigo-100 hover:border-slate-400',
         ]"
       >
+        <option :value="0" disabled>-- Pilih Skor Faktor (1 - 10) --</option>
         <option v-for="opt in scoreOptions" :key="opt.value" :value="opt.value">
           {{ opt.label }}
         </option>

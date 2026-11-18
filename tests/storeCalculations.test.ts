@@ -11,6 +11,13 @@ describe('store reactive calculations and type preservation', () => {
   test('preserves numeric calculation for non-fraud factors (no string concatenation)', async () => {
     const store = useRiskFormStore();
 
+    // Verify initial blank state (zero scores)
+    assert.equal(store.formData.identification.factorA, 0);
+    assert.equal(store.formData.identification.factorB, 0);
+    assert.equal(store.formData.identification.subScoreC, 0);
+    assert.equal(store.formData.review.gateScore, 0);
+    assert.equal(store.isEscalated, false);
+
     store.formData.identification.factorA = 7;
     store.formData.identification.factorB = 8;
     // Wait for Vue watch tick
@@ -31,6 +38,13 @@ describe('store reactive calculations and type preservation', () => {
   test('preserves numeric calculation for fraud factors', async () => {
     const store = useRiskFormStore();
     store.assessmentType = 'fraud';
+
+    // Verify initial blank state (zero scores)
+    assert.equal(store.fraudData.modus.factorA, 0);
+    assert.equal(store.fraudData.modus.factorB, 0);
+    assert.equal(store.fraudData.modus.subScoreC, 0);
+    assert.equal(store.fraudData.gate.gateScore, 0);
+    assert.equal(store.isEscalated, false);
 
     store.fraudData.modus.factorA = 2;
     store.fraudData.modus.factorB = 3;

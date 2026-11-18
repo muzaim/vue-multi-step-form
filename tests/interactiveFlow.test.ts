@@ -147,4 +147,20 @@ describe('End-to-End dynamic workflow tests', () => {
     assert.equal(fraudApprovalValidation.isValid, true);
     assert.deepEqual(fraudApprovalValidation.errors, {});
   });
+
+  test('unpopulated form starts non-escalated and blocks advancing when factors remain 0', () => {
+    const store = useRiskFormStore();
+
+    // Verify initial clean state
+    assert.equal(store.isEscalated, false);
+    assert.equal(store.gateScore, 0);
+    assert.equal(store.formData.identification.factorA, 0);
+    assert.equal(store.formData.identification.factorB, 0);
+
+    // Stage 2 validation should fail because factors are 0 (schema requires min 1)
+    const stage2Validation = validateTrackStageData('non_fraud', 2, store.formData, store.fraudData, store.isEscalated);
+    assert.equal(stage2Validation.isValid, false);
+    assert.ok(stage2Validation.errors.factorA);
+    assert.ok(stage2Validation.errors.factorB);
+  });
 });
