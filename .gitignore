@@ -23,3 +23,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# AI Agents & Assistants
+.agents/
+.gemini/
+.claude/
+.cursor/
+.windsurf/
+.copilot/
+*.agent.log
+
+# OpenSpec Local Cache & Worksets (specs and changes remain tracked)
+.openspec/
+openspec/.cache/
+openspec/**/.cache/
+openspec/worksets/
+*.openspec.local.yaml
+*.openspec.local.yml
