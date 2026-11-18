@@ -16,12 +16,12 @@ const { digitalEvidenceStatuses, isLoading } = useMasterData();
 
 <template>
   <div class="space-y-6">
-    <div class="border-b border-rose-200 pb-3">
+    <div class="border-b border-slate-200 pb-3">
       <div class="flex items-center gap-2 mb-1">
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-rose-600 text-white">
+        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-700 text-white">
           Fraud Track
         </span>
-        <span class="text-xs font-semibold text-rose-600">Stage 4 of 5/8</span>
+        <span class="text-xs font-semibold text-slate-500">Stage 4 of 5/8</span>
       </div>
       <h2 class="text-xl font-bold text-slate-900">Stage 4: Immediate Containment & Evidence Securing</h2>
       <p class="text-sm text-slate-500 mt-0.5">
@@ -29,7 +29,7 @@ const { digitalEvidenceStatuses, isLoading } = useMasterData();
       </p>
     </div>
 
-    <div class="space-y-5">
+    <div class="space-y-4">
       <!-- 1. Immediate Containment Action -->
       <div>
         <FormField label="Tindakan Pengamanan / Penahanan Aset Seketika" required :error="errors?.immediateContainmentAction" hint="Min 5 karakter">
@@ -41,7 +41,7 @@ const { digitalEvidenceStatuses, isLoading } = useMasterData();
         </FormField>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- 2. Digital Evidence Status (from API) -->
         <div>
           <FormField label="Status Bukti Digital & Forensik (Master Data API)" required :error="errors?.digitalEvidenceStatus">

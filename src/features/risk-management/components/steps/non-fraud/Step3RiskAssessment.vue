@@ -3,6 +3,7 @@ import { useRiskFormStore } from '../../../stores/useRiskFormStore';
 import { useMasterData } from '../../../composables/useMasterData';
 import FormField from '../../../../../components/ui/FormField.vue';
 import SelectInput from '../../../../../components/ui/SelectInput.vue';
+import ScoreSelectInput from '../../../../../components/ui/ScoreSelectInput.vue';
 import type { OperationalImpact } from '../../../types/risk.types';
 
 defineProps<{
@@ -24,21 +25,30 @@ const { operationalImpacts, isLoading } = useMasterData();
     </div>
 
     <!-- Live Reactive Sub-score Card: D + E = F -->
-    <div class="p-4 rounded-xl border border-indigo-200 bg-indigo-50/70 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-white border border-indigo-300 flex flex-col items-center justify-center shadow-sm">
-          <span class="text-[10px] text-indigo-500 font-bold uppercase tracking-wider">Sub F</span>
-          <span class="text-xl font-black text-indigo-700">{{ form.subScoreF }}</span>
+    <div class="p-4 rounded-xl border border-indigo-200/80 bg-indigo-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3.5">
+        <div class="w-14 h-14 rounded-xl bg-white border border-indigo-200 flex flex-col items-center justify-center shadow-xs">
+          <span class="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Sub F</span>
+          <span class="text-2xl font-black text-indigo-700">{{ form.subScoreF }}</span>
         </div>
         <div>
-          <h4 class="font-bold text-slate-800 text-sm">Impact Severity Sub-Score (F)</h4>
-          <p class="text-xs text-slate-600">
-            Formula Reaktif: Factor D ({{ form.factorD }}) + Factor E ({{ form.factorE }}) = <strong>{{ form.subScoreF }}</strong> / 20
+          <div class="flex flex-wrap items-center gap-2">
+            <h4 class="font-bold text-slate-900 text-sm">Impact Severity Sub-Score (F)</h4>
+            <span
+              v-if="store.benchmarkSubScoreF"
+              class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-md border"
+              :class="store.benchmarkSubScoreF.badgeClass"
+            >
+              API Benchmark: {{ store.benchmarkSubScoreF.label }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mt-1">
+            Formula: Factor D ({{ form.factorD }}) + Factor E ({{ form.factorE }}) = <strong>{{ form.subScoreF }}</strong> / 20 &bull; {{ store.benchmarkSubScoreF?.description }}
           </p>
         </div>
       </div>
-      <div class="hidden sm:block text-right text-xs text-indigo-700 font-medium">
-        Diakumulasikan di Stage 5
+      <div class="text-xs text-indigo-700/80 font-medium whitespace-nowrap bg-white/60 px-2.5 py-1 rounded-md border border-indigo-200/50">
+        Gate Threshold Factor (Stage 5)
       </div>
     </div>
 
@@ -59,50 +69,26 @@ const { operationalImpacts, isLoading } = useMasterData();
 
       <!-- Factors D & E Calculation Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
-        <!-- 2. Factor D -->
+        <!-- 2. Factor D (Combobox) -->
         <div>
-          <FormField
-            label="Factor D: Financial Loss Weight (1 - 10)"
-            required
-            :error="errors?.factorD"
+          <ScoreSelectInput
+            v-model="form.factorD"
+            label="Factor D: Financial Loss Weight"
             hint="Bobot estimasi kerugian finansial langsung dan recovery cost"
-          >
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorD"
-                class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-indigo-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorD }}
-              </span>
-            </div>
-          </FormField>
+            :has-error="Boolean(errors?.factorD)"
+            :error-message="errors?.factorD"
+          />
         </div>
 
-        <!-- 3. Factor E -->
+        <!-- 3. Factor E (Combobox) -->
         <div>
-          <FormField
-            label="Factor E: Regulatory Penalty Severity (1 - 10)"
-            required
-            :error="errors?.factorE"
+          <ScoreSelectInput
+            v-model="form.factorE"
+            label="Factor E: Regulatory Penalty Severity"
             hint="Tingkat keparahan sanksi kepatuhan hukum atau denda regulator"
-          >
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorE"
-                class="w-full accent-indigo-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-indigo-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorE }}
-              </span>
-            </div>
-          </FormField>
+            :has-error="Boolean(errors?.factorE)"
+            :error-message="errors?.factorE"
+          />
         </div>
       </div>
     </div>

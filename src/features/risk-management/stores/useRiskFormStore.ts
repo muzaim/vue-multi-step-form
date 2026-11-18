@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import type { RiskFormData } from '../types/risk.types';
 import type { FraudFormData, AssessmentType } from '../types/fraud.types';
-import { riskApi } from '../api/riskApi';
+import { riskApi } from '../api/riskApi.ts';
+import { scoringApi, calculateBenchmarkBand, type BenchmarkResult } from '../api/scoringApi.ts';
 
 function getInitialFormData(): RiskFormData {
   return {
@@ -254,6 +255,30 @@ export const useRiskFormStore = defineStore('riskForm', () => {
       : formData.value.review.isEscalated;
   });
 
+  const currentSubScoreC = computed(() => {
+    return assessmentType.value === 'fraud'
+      ? fraudData.value.modus.subScoreC
+      : formData.value.identification.subScoreC;
+  });
+
+  const currentSubScoreF = computed(() => {
+    return assessmentType.value === 'fraud'
+      ? fraudData.value.loss.subScoreF
+      : formData.value.analysis.subScoreF;
+  });
+
+  const currentSubScoreG = computed(() => {
+    return assessmentType.value === 'fraud'
+      ? fraudData.value.forensic.subScoreG
+      : formData.value.deepMitigation.subScoreG;
+  });
+
+  const currentSubScoreH = computed(() => {
+    return assessmentType.value === 'fraud'
+      ? fraudData.value.lawEnforcement.subScoreH
+      : formData.value.boardOversight.subScoreH;
+  });
+
   const gateScore = computed(() => {
     return assessmentType.value === 'fraud'
       ? fraudData.value.gate.gateScore
@@ -265,6 +290,112 @@ export const useRiskFormStore = defineStore('riskForm', () => {
       ? fraudData.value.boardSanction.grandCumulativeFraudScore
       : formData.value.executiveSignOff.grandCumulativeRiskScore;
   });
+
+  // --- Reactive Benchmark Evaluation via simulated Scoring API ---
+  const benchmarkSubScoreC = ref<BenchmarkResult>({
+    score: 8,
+    ...calculateBenchmarkBand(8, 'subscore'),
+  });
+  const benchmarkSubScoreF = ref<BenchmarkResult>({
+    score: 8,
+    ...calculateBenchmarkBand(8, 'subscore'),
+  });
+  const benchmarkGate = ref<BenchmarkResult>({
+    score: 16,
+    ...calculateBenchmarkBand(16, 'gate'),
+  });
+  const benchmarkSubScoreG = ref<BenchmarkResult>({
+    score: 7,
+    ...calculateBenchmarkBand(7, 'subscore'),
+  });
+  const benchmarkSubScoreH = ref<BenchmarkResult>({
+    score: 7,
+    ...calculateBenchmarkBand(7, 'subscore'),
+  });
+  const benchmarkGrandTotal = ref<BenchmarkResult>({
+    score: 30,
+    ...calculateBenchmarkBand(30, 'grand_total'),
+  });
+
+  const isEvaluatingBenchmark = ref(false);
+
+  watch(
+    currentSubScoreC,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkSubScoreC.value = await scoringApi.evaluateScore(score, 'subscore');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
+  watch(
+    currentSubScoreF,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkSubScoreF.value = await scoringApi.evaluateScore(score, 'subscore');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
+  watch(
+    gateScore,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkGate.value = await scoringApi.evaluateScore(score, 'gate');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
+  watch(
+    currentSubScoreG,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkSubScoreG.value = await scoringApi.evaluateScore(score, 'subscore');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
+  watch(
+    currentSubScoreH,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkSubScoreH.value = await scoringApi.evaluateScore(score, 'subscore');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
+  watch(
+    grandTotalScore,
+    async (score) => {
+      isEvaluatingBenchmark.value = true;
+      try {
+        benchmarkGrandTotal.value = await scoringApi.evaluateScore(score, 'grand_total');
+      } finally {
+        isEvaluatingBenchmark.value = false;
+      }
+    },
+    { immediate: true }
+  );
 
   function resetForm() {
     assessmentType.value = 'non_fraud';
@@ -322,6 +453,17 @@ export const useRiskFormStore = defineStore('riskForm', () => {
     isEscalated,
     gateScore,
     grandTotalScore,
+    currentSubScoreC,
+    currentSubScoreF,
+    currentSubScoreG,
+    currentSubScoreH,
+    benchmarkSubScoreC,
+    benchmarkSubScoreF,
+    benchmarkGate,
+    benchmarkSubScoreG,
+    benchmarkSubScoreH,
+    benchmarkGrandTotal,
+    isEvaluatingBenchmark,
     resetForm,
     saveDraft,
     submitAssessment,

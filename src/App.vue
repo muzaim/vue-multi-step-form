@@ -3,17 +3,18 @@ import RiskFormWizard from './features/risk-management/components/RiskFormWizard
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
-    <!-- Header -->
+  <div class="min-h-screen bg-slate-100/70 py-8 px-4 sm:px-6 lg:px-8 text-slate-900">
+    <!-- Polished SaaS Header -->
     <header class="max-w-4xl mx-auto mb-6 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold mb-3">
-        <span>Vue 3 + TypeScript + Pinia + Tailwind CSS Architecture</span>
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/80 text-slate-700 text-xs font-semibold mb-3">
+        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+        <span>Enterprise Risk Management Engine</span>
       </div>
-      <h1 class="text-3xl font-black text-slate-900 tracking-tight sm:text-4xl">
-        Enterprise Risk Management
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
+        Governance & Risk Assessment Portal
       </h1>
       <p class="mt-2 text-sm text-slate-600 max-w-2xl mx-auto">
-        Arsitektur multi-step form terstruktur memisahkan Presentation, Logic Composable, Centralized Pinia Store, dan Pure API Layer untuk 50 data fields.
+        Structured dual-track evaluation with automated benchmark scoring, discrete factor controls, and dynamic escalation protocols.
       </p>
     </header>
 
@@ -22,9 +23,9 @@ import RiskFormWizard from './features/risk-management/components/RiskFormWizard
       <RiskFormWizard />
     </main>
 
-    <!-- Architecture Footer Guide -->
-    <footer class="max-w-4xl mx-auto mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500">
-      <p>Clean Frontend Architecture &middot; Strict Linear Validation &middot; Dynamic Components with Keep-Alive</p>
+    <!-- Clean Architecture Footer -->
+    <footer class="max-w-4xl mx-auto mt-10 pt-4 border-t border-slate-200 text-center text-xs text-slate-500">
+      <p>Clean Enterprise Architecture &middot; Linear Multi-Step Validation &middot; Dynamic Branching (5 vs 8 Stages)</p>
     </footer>
   </div>
 </template>

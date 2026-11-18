@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { RiskFormData } from '../types/risk.types';
 import type { FraudFormData, AssessmentType } from '../types/fraud.types';
-import { validateFraudStageData, validateFullFraudForm } from './fraudValidation';
+import { validateFraudStageData, validateFullFraudForm } from './fraudValidation.ts';
 
 export const generalSchema = z.object({
   riskTitle: z.string().trim().min(5, 'Judul risiko minimal 5 karakter'),
@@ -127,8 +127,14 @@ export function validateTrackStageData(
   track: AssessmentType,
   stageIndex: number,
   formData: RiskFormData,
-  fraudData: FraudFormData
+  fraudData: FraudFormData,
+  isEscalated: boolean = false
 ): { isValid: boolean; errors: ValidationErrors } {
+  // Stage 6 (standard) and Stage 9 (escalated) are the Approval stage which needs no form field input validation
+  if ((!isEscalated && stageIndex === 6) || (isEscalated && stageIndex === 9)) {
+    return { isValid: true, errors: {} };
+  }
+
   if (stageIndex === 1) {
     const res = generalSchema.safeParse(formData.general);
     if (res.success) return { isValid: true, errors: {} };

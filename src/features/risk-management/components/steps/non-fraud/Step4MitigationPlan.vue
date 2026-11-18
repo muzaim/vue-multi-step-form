@@ -24,7 +24,7 @@ const { treatmentStrategies, isLoading } = useMasterData();
       </p>
     </div>
 
-    <div class="space-y-5">
+    <div class="space-y-4">
       <!-- 1. Action Plan Title -->
       <div>
         <FormField label="Mitigation Action Plan Title" required :error="errors?.actionPlanTitle" hint="Min 5 karakter">
@@ -36,7 +36,7 @@ const { treatmentStrategies, isLoading } = useMasterData();
         </FormField>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- 2. Treatment Strategy (from API) -->
         <div>
           <FormField label="Treatment Strategy (Master Data API)" required :error="errors?.treatmentStrategy">

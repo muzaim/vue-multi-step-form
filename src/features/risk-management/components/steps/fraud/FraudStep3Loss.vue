@@ -3,6 +3,7 @@ import { useRiskFormStore } from '../../../stores/useRiskFormStore';
 import { useMasterData } from '../../../composables/useMasterData';
 import FormField from '../../../../../components/ui/FormField.vue';
 import SelectInput from '../../../../../components/ui/SelectInput.vue';
+import ScoreSelectInput from '../../../../../components/ui/ScoreSelectInput.vue';
 
 defineProps<{
   errors?: Record<string, string>;
@@ -15,12 +16,12 @@ const { fraudLossCategories, isLoading } = useMasterData();
 
 <template>
   <div class="space-y-6">
-    <div class="border-b border-rose-200 pb-3">
+    <div class="border-b border-slate-200 pb-3">
       <div class="flex items-center gap-2 mb-1">
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-rose-600 text-white">
+        <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-rose-700 text-white">
           Fraud Track
         </span>
-        <span class="text-xs font-semibold text-rose-600">Stage 3 of 5/8</span>
+        <span class="text-xs font-semibold text-slate-500">Stage 3 of 5/8</span>
       </div>
       <h2 class="text-xl font-bold text-slate-900">Stage 3: Loss Exposure & Financial Impact</h2>
       <p class="text-sm text-slate-500 mt-0.5">
@@ -29,21 +30,30 @@ const { fraudLossCategories, isLoading } = useMasterData();
     </div>
 
     <!-- Live Reactive Sub-score Card: D + E = F -->
-    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/70 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-white border border-rose-300 flex flex-col items-center justify-center shadow-sm">
-          <span class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Sub F</span>
-          <span class="text-xl font-black text-rose-700">{{ form.subScoreF }}</span>
+    <div class="p-4 rounded-xl border border-rose-200/80 bg-rose-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3.5">
+        <div class="w-14 h-14 rounded-xl bg-white border border-rose-200 flex flex-col items-center justify-center shadow-xs">
+          <span class="text-[10px] text-rose-600 font-bold uppercase tracking-wider">Sub F</span>
+          <span class="text-2xl font-black text-rose-700">{{ form.subScoreF }}</span>
         </div>
         <div>
-          <h4 class="font-bold text-slate-800 text-sm">Financial Exposure & Severity Index (F)</h4>
-          <p class="text-xs text-slate-600">
-            Formula Reaktif: Factor D ({{ form.factorD }}) + Factor E ({{ form.factorE }}) = <strong>{{ form.subScoreF }}</strong> / 20
+          <div class="flex flex-wrap items-center gap-2">
+            <h4 class="font-bold text-slate-900 text-sm">Financial Exposure Index (F)</h4>
+            <span
+              v-if="store.benchmarkSubScoreF"
+              class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-md border"
+              :class="store.benchmarkSubScoreF.badgeClass"
+            >
+              API Benchmark: {{ store.benchmarkSubScoreF.label }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mt-1">
+            Formula: Factor D ({{ form.factorD }}) + Factor E ({{ form.factorE }}) = <strong>{{ form.subScoreF }}</strong> / 20 &bull; {{ store.benchmarkSubScoreF?.description }}
           </p>
         </div>
       </div>
-      <div class="hidden sm:block text-right text-xs text-rose-700 font-semibold">
-        Diakumulasikan di Stage 5
+      <div class="text-xs text-rose-700/80 font-medium whitespace-nowrap bg-white/60 px-2.5 py-1 rounded-md border border-rose-200/50">
+        Gate Threshold Factor (Stage 5)
       </div>
     </div>
 
@@ -64,50 +74,26 @@ const { fraudLossCategories, isLoading } = useMasterData();
 
       <!-- Factors D & E Calculation Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
-        <!-- 2. Factor D -->
+        <!-- 2. Factor D (Combobox) -->
         <div>
-          <FormField
-            label="Factor D: Bobot Kerugian Finansial Langsung (1 - 10)"
-            required
-            :error="errors?.factorD"
+          <ScoreSelectInput
+            v-model="form.factorD"
+            label="Factor D: Bobot Kerugian Finansial Langsung"
             hint="Estimasi nominal dana atau aset perusahaan yang terancam"
-          >
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorD"
-                class="w-full accent-rose-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-rose-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorD }}
-              </span>
-            </div>
-          </FormField>
+            :has-error="Boolean(errors?.factorD)"
+            :error-message="errors?.factorD"
+          />
         </div>
 
-        <!-- 3. Factor E -->
+        <!-- 3. Factor E (Combobox) -->
         <div>
-          <FormField
-            label="Factor E: Keparahan Reputasi & Sanksi Regulator (1 - 10)"
-            required
-            :error="errors?.factorE"
-            hint="Potensi investigasi eksternal, pencabutan izin, atau pemberitaan media"
-          >
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorE"
-                class="w-full accent-rose-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-rose-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorE }}
-              </span>
-            </div>
-          </FormField>
+          <ScoreSelectInput
+            v-model="form.factorE"
+            label="Factor E: Keparahan Reputasi & Sanksi Regulator"
+            hint="Potensi investigasi eksternal, denda atau pemberitaan media"
+            :has-error="Boolean(errors?.factorE)"
+            :error-message="errors?.factorE"
+          />
         </div>
       </div>
     </div>

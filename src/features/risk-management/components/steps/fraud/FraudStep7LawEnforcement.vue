@@ -3,6 +3,7 @@ import { useRiskFormStore } from '../../../stores/useRiskFormStore';
 import { useMasterData } from '../../../composables/useMasterData';
 import FormField from '../../../../../components/ui/FormField.vue';
 import SelectInput from '../../../../../components/ui/SelectInput.vue';
+import ScoreSelectInput from '../../../../../components/ui/ScoreSelectInput.vue';
 
 defineProps<{
   errors?: Record<string, string>;
@@ -15,12 +16,12 @@ const { lawEnforcementAgencies, isLoading } = useMasterData();
 
 <template>
   <div class="space-y-6">
-    <div class="border-b border-rose-200 pb-3">
+    <div class="border-b border-slate-200 pb-3">
       <div class="flex items-center gap-2 mb-1">
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-rose-600 text-white">
+        <span class="px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-rose-700 text-white">
           Fraud Escalated Protocol
         </span>
-        <span class="text-xs font-semibold text-rose-600">Stage 7 of 8</span>
+        <span class="text-xs font-semibold text-slate-500">Stage 7 of 8</span>
       </div>
       <h2 class="text-xl font-bold text-slate-900">Stage 7: Law Enforcement & Whistleblower Protection</h2>
       <p class="text-sm text-slate-500 mt-0.5">
@@ -29,21 +30,30 @@ const { lawEnforcementAgencies, isLoading } = useMasterData();
     </div>
 
     <!-- Sub-score H Card: H1 + H2 = H -->
-    <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/70 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-white border border-rose-300 flex flex-col items-center justify-center shadow-sm">
-          <span class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Sub H</span>
-          <span class="text-xl font-black text-rose-700">{{ form.subScoreH }}</span>
+    <div class="p-4 rounded-xl border border-rose-200/80 bg-rose-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3.5">
+        <div class="w-14 h-14 rounded-xl bg-white border border-rose-200 flex flex-col items-center justify-center shadow-xs">
+          <span class="text-[10px] text-rose-600 font-bold uppercase tracking-wider">Sub H</span>
+          <span class="text-2xl font-black text-rose-700">{{ form.subScoreH }}</span>
         </div>
         <div>
-          <h4 class="font-bold text-slate-800 text-sm">Prosecution & Whistleblower Index (H)</h4>
-          <p class="text-xs text-slate-600">
-            Formula Reaktif: Factor H1 ({{ form.factorH1 }}) + Factor H2 ({{ form.factorH2 }}) = <strong>{{ form.subScoreH }}</strong> / 20
+          <div class="flex flex-wrap items-center gap-2">
+            <h4 class="font-bold text-slate-900 text-sm">Prosecution & Whistleblower Index (H)</h4>
+            <span
+              v-if="store.benchmarkSubScoreH"
+              class="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-md border"
+              :class="store.benchmarkSubScoreH.badgeClass"
+            >
+              API Benchmark: {{ store.benchmarkSubScoreH.label }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 mt-1">
+            Formula: Factor H1 ({{ form.factorH1 }}) + Factor H2 ({{ form.factorH2 }}) = <strong>{{ form.subScoreH }}</strong> / 20 &bull; {{ store.benchmarkSubScoreH?.description }}
           </p>
         </div>
       </div>
-      <div class="text-right text-xs text-rose-700 font-semibold">
-        Escalation Step 2/3
+      <div class="text-xs text-rose-700/80 font-medium whitespace-nowrap bg-white/60 px-2.5 py-1 rounded-md border border-rose-200/50">
+        Escalation Track 2/3
       </div>
     </div>
 
@@ -64,40 +74,26 @@ const { lawEnforcementAgencies, isLoading } = useMasterData();
 
       <!-- Factors H1 & H2 Calculation Row -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-50 border border-slate-200">
-        <!-- 2. Factor H1 -->
+        <!-- 2. Factor H1 (Combobox) -->
         <div>
-          <FormField label="Factor H1: Kerahasiaan & Proteksi Whistleblower (1 - 10)" required :error="errors?.factorH1">
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorH1"
-                class="w-full accent-rose-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-rose-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorH1 }}
-              </span>
-            </div>
-          </FormField>
+          <ScoreSelectInput
+            v-model="form.factorH1"
+            label="Factor H1: Proteksi Whistleblower"
+            hint="Kerahasiaan dan perlindungan pelapor anomali"
+            :has-error="Boolean(errors?.factorH1)"
+            :error-message="errors?.factorH1"
+          />
         </div>
 
-        <!-- 3. Factor H2 -->
+        <!-- 3. Factor H2 (Combobox) -->
         <div>
-          <FormField label="Factor H2: Risiko Tuntutan Balik / Counter-Litigation (1 - 10)" required :error="errors?.factorH2">
-            <div class="flex items-center gap-4 mt-2">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                v-model.number="form.factorH2"
-                class="w-full accent-rose-600 cursor-pointer h-2 bg-slate-200 rounded-lg"
-              />
-              <span class="w-10 text-center font-bold text-lg text-rose-700 bg-white border border-slate-200 rounded-md py-1">
-                {{ form.factorH2 }}
-              </span>
-            </div>
-          </FormField>
+          <ScoreSelectInput
+            v-model="form.factorH2"
+            label="Factor H2: Risiko Gugatan Balik"
+            hint="Mitigasi potensi counter-litigation atau pencemaran nama baik"
+            :has-error="Boolean(errors?.factorH2)"
+            :error-message="errors?.factorH2"
+          />
         </div>
       </div>
     </div>
